@@ -6,7 +6,7 @@ export const getProperties = async (req: Request, res: Response): Promise<void> 
     try {
       const userId = req.headers["x-user-id"] as string
       const { data, error } = await supabase
-        .from("properties")
+        .from("Properties")
         .select("*")
         .eq("user_id", userId)
 
@@ -27,7 +27,7 @@ export const getProperties = async (req: Request, res: Response): Promise<void> 
   export const createProperty = async (req: Request, res: Response): Promise<void> => {
     try {
       const property: Property = req.body
-      const { data, error } = await supabase.from("properties").insert([property])
+      const { data, error } = await supabase.from("Properties").insert([property])
       if (error) {
         res.status(500).json({ error })
         return
@@ -42,7 +42,7 @@ export const getProperties = async (req: Request, res: Response): Promise<void> 
   export const deleteProperty = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params
-      const { error } = await supabase.from("properties").delete().eq("id", id)
+      const { error } = await supabase.from("Properties").delete().eq("id", id)
       if (error) {
         res.status(500).json({ error })
         return
