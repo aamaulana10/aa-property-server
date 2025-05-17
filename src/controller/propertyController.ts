@@ -1,0 +1,55 @@
+import { Request, Response } from "express"
+import { supabase } from "../utils/supabase"
+import { Property } from "../response/Property"
+
+export const getProperties = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = req.headers["x-user-id"] as string
+      const { data, error } = await supabase
+        .from("properties")
+        .select("*")
+        .eq("user_id", userId)
+
+        console.log("Data:", data)
+        console.log("Error:", error)
+  
+      if (error) {
+        res.status(500).json({ error })
+        return
+      }
+  
+      res.json(data)
+    } catch (err) {
+      res.status(500).json({ error: "Unexpected error" })
+    }
+  }
+
+  export const createProperty = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const property: Property = req.body
+      const { data, error } = await supabase.from("properties").insert([property])
+      if (error) {
+        res.status(500).json({ error })
+        return
+      }
+  
+      res.status(200).json(property)
+    } catch (err) {
+      res.status(500).json({ error: "Unexpected error" })
+    }
+  }
+
+  export const deleteProperty = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { error } = await supabase.from("properties").delete().eq("id", id)
+      if (error) {
+        res.status(500).json({ error })
+        return
+      }
+  
+      res.status(204).send()
+    } catch (err) {
+      res.status(500).json({ error: "Unexpected error" })
+    }
+  }
