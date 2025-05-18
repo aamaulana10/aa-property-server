@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { supabase } from "../utils/supabase"
 import { Property } from "../response/Property"
+import { v4 as uuidv4 } from "uuid"
 
 export const getProperties = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -9,9 +10,6 @@ export const getProperties = async (req: Request, res: Response): Promise<void> 
         .from("Properties")
         .select("*")
         .eq("user_id", userId)
-
-        console.log("Data:", data)
-        console.log("Error:", error)
   
       if (error) {
         res.status(500).json({ error })
@@ -27,7 +25,10 @@ export const getProperties = async (req: Request, res: Response): Promise<void> 
   export const createProperty = async (req: Request, res: Response): Promise<void> => {
     try {
       const property: Property = req.body
+      property.user_id = req.headers["x-user-id"] as string
+      property.id = uuidv4()
       const { data, error } = await supabase.from("Properties").insert([property])
+
       if (error) {
         res.status(500).json({ error })
         return
