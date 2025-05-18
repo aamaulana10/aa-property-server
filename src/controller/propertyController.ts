@@ -40,6 +40,41 @@ export const getProperties = async (req: Request, res: Response): Promise<void> 
     }
   }
 
+  export const updateProperty = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const userId = req.headers["x-user-id"] as string
+      const updates: Partial<Property> = req.body
+  
+      const { data: existingProperty, error: fetchError } = await supabase
+        .from("Properties")
+        .select("*")
+        .eq("id", id)
+        .eq("user_id", userId)
+        .single()
+  
+      if (fetchError || !existingProperty) {
+        res.status(404).json({ error: "Property not found or unauthorized" })
+        return
+      }
+  
+      const { error } = await supabase
+        .from("Properties")
+        .update(updates)
+        .eq("id", id)
+        .eq("user_id", userId)
+  
+      if (error) {
+        res.status(500).json({ error })
+        return
+      }
+  
+      res.status(200).json({ message: "Property updated successfully" })
+    } catch (err) {
+      res.status(500).json({ error: "Unexpected error" })
+    }
+  }
+
   export const deleteProperty = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params
